@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import LibraryIllustration from "../..//Assets/Images/Library_Illustration_1.jpg";
+import Searching from "../../Assets/Images/Searching.jpg";
 import "./Home.css";
 import jwt_decode from "jwt-decode";
 import {
@@ -72,7 +72,7 @@ function Home() {
       <div className="home-page-img-container">
         <img
           className="home-page-background-img"
-          src={LibraryIllustration}
+          src={Searching}
           alt="Library Illustration"
         />
       </div>

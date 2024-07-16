@@ -1,5 +1,5 @@
 .home-component-container {
-  background-color: var(--pure-white);
+  background-color: black;
 }
 
 .home-page-img-container {
@@ -17,7 +17,7 @@
 .homepage-headings {
   margin-top: 6rem;
   margin-bottom: 0;
-  background-color: var(--pure-white);
+  background-color: black;
 }
 
 .genre-cards-container {
@@ -28,7 +28,7 @@
   gap: 5px;
   justify-content: center;
   justify-items: center;
-  background-color: var(--pure-white);
+  background-color: black;
 }
 
 .homepage-explore-all-btn {
@@ -57,7 +57,7 @@
   height: fit-content;
   display: grid;
   grid-template-columns: repeat(auto-fit, 30rem);
-  background-color: var(--pure-white);
+  background-color: black;
   gap: 1rem;
   padding: 4rem;
   justify-content: center;
