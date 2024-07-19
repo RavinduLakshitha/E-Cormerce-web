@@ -1,106 +1,145 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import jwt_decode from 'jwt-decode';
-import Navbar from './Navbar';
+import React, { useEffect } from "react";
+import "./Navbar.css";
+import { Link, useLocation } from "react-router-dom";
+import jwt_decode from "jwt-decode";
+import {
+  useUserLogin,
+  useToast,
+  useWishlist,
+  useCart,
+  useOrders,
+  useSearchBar,
+} from "../../index";
+import { BsShopWindow, BsFillBagFill } from "react-icons/bs";
 
-jest.mock('jwt-decode', () => jest.fn());
+function Navbar() {
+  const { userWishlist, dispatchUserWishlist } = useWishlist();
+  const { userCart, dispatchUserCart } = useCart();
+  const { userOrders, dispatchUserOrders } = useOrders();
+  const { setUserLoggedIn } = useUserLogin(false);
+  const { showToast } = useToast();
+  const location = useLocation();
+  const { searchBarTerm, setSearchBarTerm } = useSearchBar();
 
-const mockUseWishlist = jest.fn().mockReturnValue({
-  userWishlist: [],
-  dispatchUserWishlist: jest.fn(),
-});
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const user = jwt_decode(token);
 
-const mockUseCart = jest.fn().mockReturnValue({
-  userCart: [],
-  dispatchUserCart: jest.fn(),
-});
+      if (!user) {
+        localStorage.removeItem("token");
+        setUserLoggedIn(false);
+      } else {
+        setUserLoggedIn(true);
+      }
+    }
+  }, []);
 
-const mockUseOrders = jest.fn().mockReturnValue({
-  userOrders: [],
-  dispatchUserOrders: jest.fn(),
-});
+  useEffect(() => {
+    function handleInvalidToken() {
+      if (localStorage.getItem("token") !== null) {
+        setUserLoggedIn(true);
+      } else {
+        setUserLoggedIn(false);
+        dispatchUserWishlist({ type: "UPDATE_USER_WISHLIST", payload: [] });
+        dispatchUserCart({ type: "UPDATE_USER_CART", payload: [] });
+        dispatchUserOrders({ type: "UPDATE_USER_ORDERS", payload: [] });
+      }
+    }
+    window.addEventListener("storage", handleInvalidToken);
 
-const mockUseUserLogin = jest.fn().mockReturnValue({
-  setUserLoggedIn: jest.fn(),
-});
+    return function cleanup() {
+      window.removeEventListener("storage", handleInvalidToken);
+    };
+  }, [userWishlist, userCart]);
 
-const mockUseToast = jest.fn().mockReturnValue({
-  showToast: jest.fn(),
-});
-
-const mockUseSearchBar = jest.fn().mockReturnValue({
-  searchBarTerm: '',
-  setSearchBarTerm: jest.fn(),
-});
-
-jest.mock('../../index', () => ({
-  useWishlist: () => mockUseWishlist(),
-  useCart: () => mockUseCart(),
-  useOrders: () => mockUseOrders(),
-  useUserLogin: () => mockUseUserLogin(),
-  useToast: () => mockUseToast(),
-  useSearchBar: () => mockUseSearchBar(),
-}));
-
-describe('Navbar', () => {
-  afterEach(() => {
+  function logoutUser() {
+    localStorage.removeItem("token");
+    dispatchUserWishlist({ type: "UPDATE_USER_WISHLIST", payload: [] });
+    dispatchUserCart({ type: "UPDATE_USER_CART", payload: [] });
+    dispatchUserOrders({ type: "UPDATE_USER_ORDERS", payload: [] });
+    setUserLoggedIn(false);
     localStorage.clear();
-    jest.clearAllMocks();
-  });
+    showToast("success", "", "Logged out successfully");
+  }
 
-  test('renders login button when user is not logged in', () => {
-    render(
-      <Router>
-        <Navbar />
-      </Router>
-    );
+  return (
+    <div className="top-bar">
+      <div className="left-topbar-container">
+        {/* <button id="top-bar-ham-menu-btn" className="icon-btn"><i className="fa fa-bars" aria-hidden="true"></i></button> */}
+        <Link to="/">
+          <h2 className="top-bar-brand-name">BookBreeze</h2>
+        </Link>
+        {location.pathname === "/shop" && (
+          <div className="search-bar">
+            <input
+              className="search-bar-input"
+              placeholder="Search"
+              value={searchBarTerm}
+              onChange={(event) => setSearchBarTerm(event.target.value)}
+            />
+          </div>
+        )}
+      </div>
+      <div className="right-topbar-container">
+        {localStorage.getItem("token") !== null ? (
+          <button
+            onClick={logoutUser}
+            className="navbar-login-btn solid-primary-btn"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link to="/login">
+            <button className="navbar-login-btn solid-primary-btn">
+              Login
+            </button>
+          </Link>
+        )}
+        <Link to="/shop">
+          <button className="icon-btn">
+            <div>
+              <BsShopWindow />
+            </div>
+          </button>
+        </Link>
+        <Link to="/wishlist">
+          <button className="icon-btn">
+            <div className="icon-count-badge">
+              <i className="fa fa-heart-o fa-x" aria-hidden="true"></i>
+              {userWishlist.length !== 0 && (
+                <span className="count-badge-x">{userWishlist.length}</span>
+              )}
+            </div>
+          </button>
+        </Link>
+        <Link to="/cart">
+          <button className="icon-btn">
+            <div className="icon-count-badge">
+              <i className="fa fa-shopping-cart fa-x" aria-hidden="true"></i>
+              {userCart.length !== 0 && (
+                <span className="count-badge-x">{userCart.length}</span>
+              )}
+            </div>
+          </button>
+        </Link>
+        <Link to="/orders">
+          <button className="icon-btn">
+            <div className="icon-count-badge">
+              <BsFillBagFill
+                style={{
+                  marginBottom: "4px",
+                }}
+              />
+              {userOrders.length !== 0 && (
+                <span className="count-badge-x">{userOrders.length}</span>
+              )}
+            </div>
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
-    expect(screen.getByText(/login/i)).toBeInTheDocument();
-  });
-
-  test('renders logout button when user is logged in', () => {
-    localStorage.setItem('token', 'dummyToken');
-    jwt_decode.mockReturnValue({ user: 'testUser' });
-
-    render(
-      <Router>
-        <Navbar />
-      </Router>
-    );
-
-    expect(screen.getByText(/logout/i)).toBeInTheDocument();
-  });
-
-  test('handles logout correctly', () => {
-    localStorage.setItem('token', 'dummyToken');
-    jwt_decode.mockReturnValue({ user: 'testUser' });
-
-    const { getByText } = render(
-      <Router>
-        <Navbar />
-      </Router>
-    );
-
-    fireEvent.click(getByText(/logout/i));
-
-    expect(mockUseUserLogin().setUserLoggedIn).toHaveBeenCalledWith(false);
-    expect(mockUseWishlist().dispatchUserWishlist).toHaveBeenCalledWith({
-      type: 'UPDATE_USER_WISHLIST',
-      payload: [],
-    });
-    expect(mockUseCart().dispatchUserCart).toHaveBeenCalledWith({
-      type: 'UPDATE_USER_CART',
-      payload: [],
-    });
-    expect(mockUseOrders().dispatchUserOrders).toHaveBeenCalledWith({
-      type: 'UPDATE_USER_ORDERS',
-      payload: [],
-    });
-    expect(mockUseToast().showToast).toHaveBeenCalledWith(
-      'success',
-      '',
-      'Logged out successfully'
-    );
-  });
-});
+export { Navbar };
