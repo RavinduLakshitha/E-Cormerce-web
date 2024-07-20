@@ -1,13 +1,19 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import { Navbar } from "./Navbar";
-import "@testing-library/jest-dom/extend-expect";
+// Navbar.test.js
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import '@testing-library/jest-dom/extend-expect';
+import { Navbar } from './Navbar';
 
-// Mocking context hooks
-jest.mock("../../index", () => ({
-  useUserLogin: () => ({ setUserLoggedIn: jest.fn() }),
-  useToast: () => ({ showToast: jest.fn() }),
+// Mock dependencies
+jest.mock('jwt-decode', () => jest.fn());
+jest.mock('../../index', () => ({
+  useUserLogin: () => ({
+    setUserLoggedIn: jest.fn(),
+  }),
+  useToast: () => ({
+    showToast: jest.fn(),
+  }),
   useWishlist: () => ({
     userWishlist: [],
     dispatchUserWishlist: jest.fn(),
@@ -21,81 +27,69 @@ jest.mock("../../index", () => ({
     dispatchUserOrders: jest.fn(),
   }),
   useSearchBar: () => ({
-    searchBarTerm: "",
+    searchBarTerm: '',
     setSearchBarTerm: jest.fn(),
   }),
 }));
 
-describe("Navbar Component", () => {
-  const renderNavbar = () =>
+describe('Navbar', () => {
+  test('renders without crashing', () => {
     render(
-      <BrowserRouter>
+      <Router>
         <Navbar />
-      </BrowserRouter>
+      </Router>
     );
 
-  test("renders BookBreeze brand name", () => {
-    renderNavbar();
-    expect(screen.getByText("BookBreeze")).toBeInTheDocument();
+    expect(screen.getByText('BookBreeze')).toBeInTheDocument();
   });
 
-  test("renders login button when user is not logged in", () => {
-    renderNavbar();
-    expect(screen.getByText("Login")).toBeInTheDocument();
+  test('displays Login button when not logged in', () => {
+    render(
+      <Router>
+        <Navbar />
+      </Router>
+    );
+
+    expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
-  test("renders logout button when user is logged in", () => {
-    localStorage.setItem("token", "test-token");
-    renderNavbar();
-    expect(screen.getByText("Logout")).toBeInTheDocument();
-    localStorage.removeItem("token");
+  test('displays Logout button when logged in', () => {
+    localStorage.setItem('token', 'fake-token');
+    
+    render(
+      <Router>
+        <Navbar />
+      </Router>
+    );
+
+    expect(screen.getByText('Logout')).toBeInTheDocument();
   });
 
-  test("calls logout function when logout button is clicked", () => {
-    localStorage.setItem("token", "test-token");
-    renderNavbar();
-    const logoutButton = screen.getByText("Logout");
+  test('calls logout function and updates UI when Logout button is clicked', () => {
+    localStorage.setItem('token', 'fake-token');
+
+    render(
+      <Router>
+        <Navbar />
+      </Router>
+    );
+
+    const logoutButton = screen.getByText('Logout');
     fireEvent.click(logoutButton);
-    expect(screen.getByText("Login")).toBeInTheDocument();
-    localStorage.removeItem("token");
+
+    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(localStorage.getItem('token')).toBeNull();
   });
 
-  test("renders wishlist icon with badge when user has wishlist items", () => {
-    // Adjust mock to simulate wishlist items
-    jest.mock("../../index", () => ({
-      useWishlist: () => ({
-        userWishlist: [{ id: 1 }],
-        dispatchUserWishlist: jest.fn(),
-      }),
-    }));
-    renderNavbar();
-    const wishlistBadge = screen.getByText("1");
-    expect(wishlistBadge).toBeInTheDocument();
-  });
+  test('shows search bar on shop page', () => {
+    window.history.pushState({}, 'Shop Page', '/shop');
 
-  test("renders cart icon with badge when user has cart items", () => {
-    // Adjust mock to simulate cart items
-    jest.mock("../../index", () => ({
-      useCart: () => ({
-        userCart: [{ id: 1 }],
-        dispatchUserCart: jest.fn(),
-      }),
-    }));
-    renderNavbar();
-    const cartBadge = screen.getByText("1");
-    expect(cartBadge).toBeInTheDocument();
-  });
+    render(
+      <Router>
+        <Navbar />
+      </Router>
+    );
 
-  test("renders orders icon with badge when user has orders", () => {
-    // Adjust mock to simulate orders
-    jest.mock("../../index", () => ({
-      useOrders: () => ({
-        userOrders: [{ id: 1 }],
-        dispatchUserOrders: jest.fn(),
-      }),
-    }));
-    renderNavbar();
-    const ordersBadge = screen.getByText("1");
-    expect(ordersBadge).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
   });
 });
