@@ -13,33 +13,42 @@ import {
 } from "../../index";
 import jwt_decode from "jwt-decode";
 
-jest.mock("../../index");
 jest.mock("jwt-decode");
+jest.mock("../../index");
 
 describe("Navbar", () => {
+  const mockSetUserLoggedIn = jest.fn();
+  const mockShowToast = jest.fn();
+  const mockDispatchUserWishlist = jest.fn();
+  const mockDispatchUserCart = jest.fn();
+  const mockDispatchUserOrders = jest.fn();
+  const mockSetSearchBarTerm = jest.fn();
+
   beforeEach(() => {
+    useUserLogin.mockReturnValue({
+      setUserLoggedIn: mockSetUserLoggedIn,
+    });
+    useToast.mockReturnValue({
+      showToast: mockShowToast,
+    });
     useWishlist.mockReturnValue({
       userWishlist: [],
-      dispatchUserWishlist: jest.fn(),
+      dispatchUserWishlist: mockDispatchUserWishlist,
     });
     useCart.mockReturnValue({
       userCart: [],
-      dispatchUserCart: jest.fn(),
+      dispatchUserCart: mockDispatchUserCart,
     });
     useOrders.mockReturnValue({
       userOrders: [],
-      dispatchUserOrders: jest.fn(),
-    });
-    useUserLogin.mockReturnValue({
-      setUserLoggedIn: jest.fn(),
-    });
-    useToast.mockReturnValue({
-      showToast: jest.fn(),
+      dispatchUserOrders: mockDispatchUserOrders,
     });
     useSearchBar.mockReturnValue({
       searchBarTerm: "",
-      setSearchBarTerm: jest.fn(),
+      setSearchBarTerm: mockSetSearchBarTerm,
     });
+
+    localStorage.clear();
   });
 
   test("renders Navbar component", () => {
@@ -55,26 +64,6 @@ describe("Navbar", () => {
 
   test("logs out user", () => {
     localStorage.setItem("token", "fakeToken");
-    const setUserLoggedIn = jest.fn();
-    const dispatchUserWishlist = jest.fn();
-    const dispatchUserCart = jest.fn();
-    const dispatchUserOrders = jest.fn();
-    const showToast = jest.fn();
-
-    useUserLogin.mockReturnValue({ setUserLoggedIn });
-    useWishlist.mockReturnValue({
-      userWishlist: [],
-      dispatchUserWishlist,
-    });
-    useCart.mockReturnValue({
-      userCart: [],
-      dispatchUserCart,
-    });
-    useOrders.mockReturnValue({
-      userOrders: [],
-      dispatchUserOrders,
-    });
-    useToast.mockReturnValue({ showToast });
 
     render(
       <MemoryRouter>
@@ -85,23 +74,52 @@ describe("Navbar", () => {
     fireEvent.click(screen.getByText("Logout"));
 
     expect(localStorage.getItem("token")).toBeNull();
-    expect(setUserLoggedIn).toHaveBeenCalledWith(false);
-    expect(dispatchUserWishlist).toHaveBeenCalledWith({
+    expect(mockSetUserLoggedIn).toHaveBeenCalledWith(false);
+    expect(mockDispatchUserWishlist).toHaveBeenCalledWith({
       type: "UPDATE_USER_WISHLIST",
       payload: [],
     });
-    expect(dispatchUserCart).toHaveBeenCalledWith({
+    expect(mockDispatchUserCart).toHaveBeenCalledWith({
       type: "UPDATE_USER_CART",
       payload: [],
     });
-    expect(dispatchUserOrders).toHaveBeenCalledWith({
+    expect(mockDispatchUserOrders).toHaveBeenCalledWith({
       type: "UPDATE_USER_ORDERS",
       payload: [],
     });
-    expect(showToast).toHaveBeenCalledWith(
+    expect(mockShowToast).toHaveBeenCalledWith(
       "success",
       "",
       "Logged out successfully"
     );
+  });
+
+  test("handles invalid token", () => {
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
+
+    localStorage.setItem("token", "fakeToken");
+    jwt_decode.mockReturnValue(null);
+
+    expect(localStorage.getItem("token")).toBe("fakeToken");
+    expect(mockSetUserLoggedIn).toHaveBeenCalledWith(false);
+    expect(localStorage.getItem("token")).toBeNull();
+  });
+
+  test("handles valid token", () => {
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
+
+    localStorage.setItem("token", "validToken");
+    jwt_decode.mockReturnValue({ user: "validUser" });
+
+    expect(localStorage.getItem("token")).toBe("validToken");
+    expect(mockSetUserLoggedIn).toHaveBeenCalledWith(true);
   });
 });
