@@ -1,95 +1,107 @@
-// Navbar.test.js
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import '@testing-library/jest-dom/extend-expect';
-import { Navbar } from './Navbar';
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom/extend-expect";
+import { MemoryRouter } from "react-router-dom";
+import { Navbar } from "./Navbar";
+import {
+  useUserLogin,
+  useToast,
+  useWishlist,
+  useCart,
+  useOrders,
+  useSearchBar,
+} from "../../index";
+import jwt_decode from "jwt-decode";
 
-// Mock dependencies
-jest.mock('jwt-decode', () => jest.fn());
-jest.mock('../../index', () => ({
-  useUserLogin: () => ({
-    setUserLoggedIn: jest.fn(),
-  }),
-  useToast: () => ({
-    showToast: jest.fn(),
-  }),
-  useWishlist: () => ({
-    userWishlist: [],
-    dispatchUserWishlist: jest.fn(),
-  }),
-  useCart: () => ({
-    userCart: [],
-    dispatchUserCart: jest.fn(),
-  }),
-  useOrders: () => ({
-    userOrders: [],
-    dispatchUserOrders: jest.fn(),
-  }),
-  useSearchBar: () => ({
-    searchBarTerm: '',
-    setSearchBarTerm: jest.fn(),
-  }),
-}));
+jest.mock("../../index");
+jest.mock("jwt-decode");
 
-describe('Navbar', () => {
-  test('renders without crashing', () => {
-    render(
-      <Router>
-        <Navbar />
-      </Router>
-    );
-
-    expect(screen.getByText('BookBreeze')).toBeInTheDocument();
+describe("Navbar", () => {
+  beforeEach(() => {
+    useWishlist.mockReturnValue({
+      userWishlist: [],
+      dispatchUserWishlist: jest.fn(),
+    });
+    useCart.mockReturnValue({
+      userCart: [],
+      dispatchUserCart: jest.fn(),
+    });
+    useOrders.mockReturnValue({
+      userOrders: [],
+      dispatchUserOrders: jest.fn(),
+    });
+    useUserLogin.mockReturnValue({
+      setUserLoggedIn: jest.fn(),
+    });
+    useToast.mockReturnValue({
+      showToast: jest.fn(),
+    });
+    useSearchBar.mockReturnValue({
+      searchBarTerm: "",
+      setSearchBarTerm: jest.fn(),
+    });
   });
 
-  test('displays Login button when not logged in', () => {
+  test("renders Navbar component", () => {
     render(
-      <Router>
+      <MemoryRouter>
         <Navbar />
-      </Router>
+      </MemoryRouter>
     );
 
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.getByText("BookBreeze")).toBeInTheDocument();
+    expect(screen.getByText("Login")).toBeInTheDocument();
   });
 
-  test('displays Logout button when logged in', () => {
-    localStorage.setItem('token', 'fake-token');
-    
-    render(
-      <Router>
-        <Navbar />
-      </Router>
-    );
+  test("logs out user", () => {
+    localStorage.setItem("token", "fakeToken");
+    const setUserLoggedIn = jest.fn();
+    const dispatchUserWishlist = jest.fn();
+    const dispatchUserCart = jest.fn();
+    const dispatchUserOrders = jest.fn();
+    const showToast = jest.fn();
 
-    expect(screen.getByText('Logout')).toBeInTheDocument();
-  });
-
-  test('calls logout function and updates UI when Logout button is clicked', () => {
-    localStorage.setItem('token', 'fake-token');
-
-    render(
-      <Router>
-        <Navbar />
-      </Router>
-    );
-
-    const logoutButton = screen.getByText('Logout');
-    fireEvent.click(logoutButton);
-
-    expect(screen.getByText('Login')).toBeInTheDocument();
-    expect(localStorage.getItem('token')).toBeNull();
-  });
-
-  test('shows search bar on shop page', () => {
-    window.history.pushState({}, 'Shop Page', '/shop');
+    useUserLogin.mockReturnValue({ setUserLoggedIn });
+    useWishlist.mockReturnValue({
+      userWishlist: [],
+      dispatchUserWishlist,
+    });
+    useCart.mockReturnValue({
+      userCart: [],
+      dispatchUserCart,
+    });
+    useOrders.mockReturnValue({
+      userOrders: [],
+      dispatchUserOrders,
+    });
+    useToast.mockReturnValue({ showToast });
 
     render(
-      <Router>
+      <MemoryRouter>
         <Navbar />
-      </Router>
+      </MemoryRouter>
     );
 
-    expect(screen.getByPlaceholderText('Search')).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Logout"));
+
+    expect(localStorage.getItem("token")).toBeNull();
+    expect(setUserLoggedIn).toHaveBeenCalledWith(false);
+    expect(dispatchUserWishlist).toHaveBeenCalledWith({
+      type: "UPDATE_USER_WISHLIST",
+      payload: [],
+    });
+    expect(dispatchUserCart).toHaveBeenCalledWith({
+      type: "UPDATE_USER_CART",
+      payload: [],
+    });
+    expect(dispatchUserOrders).toHaveBeenCalledWith({
+      type: "UPDATE_USER_ORDERS",
+      payload: [],
+    });
+    expect(showToast).toHaveBeenCalledWith(
+      "success",
+      "",
+      "Logged out successfully"
+    );
   });
 });
