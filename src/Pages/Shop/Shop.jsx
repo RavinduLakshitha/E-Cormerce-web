@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { useLocation } from "react-router-dom";
 import "./Shop.css";
 import {
@@ -13,6 +13,7 @@ import {
 import { useProductAvailable } from "../../Context/product-context";
 import axios from "axios";
 
+const jwt_decode = jwtDecode;
 function Shop(props) {
   let {
     productsAvailableList,

@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./Navbar.css";
 import { Link, useLocation } from "react-router-dom";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import {
   useUserLogin,
   useToast,
@@ -12,6 +12,7 @@ import {
 } from "../../index";
 import { BsShopWindow, BsFillBagFill } from "react-icons/bs";
 
+const jwt_decode = jwtDecode;
 function Navbar() {
   const { userWishlist, dispatchUserWishlist } = useWishlist();
   const { userCart, dispatchUserCart } = useCart();

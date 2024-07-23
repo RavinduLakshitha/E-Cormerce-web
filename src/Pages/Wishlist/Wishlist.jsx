@@ -1,5 +1,5 @@
 import "./Wishlist.css";
-import  jwtDecode  from 'jwt-decode';
+import {jwtDecode} from "jwt-decode";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import {} from "../../Context/wishlist-context";
@@ -7,6 +7,8 @@ import { WishlistProductCard, useWishlist, useCart } from "../../index";
 import Lottie from "react-lottie";
 import HeartLottie from "../../Assets/Icons/heart.json";
 import { useEffect } from "react";
+
+const jwt_decode = jwtDecode;
 
 function Wishlist() {
   const { userWishlist, dispatchUserWishlist } = useWishlist();
@@ -25,7 +27,7 @@ function Wishlist() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      const user = jwt_decode(token);
+      const user = jwtDecode(token);
       if (!user) {
         localStorage.removeItem("token");
       } else {

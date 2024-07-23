@@ -4,7 +4,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Searching from "../../Assets/Images/Searching.jpg";
 import "./Home.css";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import {
   GenreCard,
   NewArrivals,
@@ -15,6 +15,7 @@ import {
 import { useProductAvailable } from "../../Context/product-context";
 import { useGenre } from "../../Context/genre-context";
 
+const jwt_decode = jwtDecode;
 function Home() {
   const { dispatchProductFilterOptions } = useProductAvailable();
   const { dispatchUserWishlist } = useWishlist();

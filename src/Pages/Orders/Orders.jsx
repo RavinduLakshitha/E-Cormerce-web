@@ -1,12 +1,13 @@
 import "./Orders.css";
 import { useEffect } from "react";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import { ProductOrderCard, useWishlist, useCart, useOrders } from "../../index";
 import Lottie from "react-lottie";
 import GuyWithBookLottie from "../../Assets/Icons/guy_with_book.json";
 
+const jwt_decode = jwtDecode;
 function Orders() {
   const { userWishlist, dispatchUserWishlist } = useWishlist();
   const { userCart, dispatchUserCart } = useCart();

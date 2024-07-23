@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import "./ProductPage.css";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { useToast, useWishlist, useCart } from "../../index";
 
+const jwt_decode = jwtDecode;
 function ProductPage() {
   const navigate = useNavigate();
 

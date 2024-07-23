@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import "./ProductCard.css";
 import { useToast } from "../../Context/toast-context";
 import { useWishlist } from "../../Context/wishlist-context";
+
+const jwt_decode = jwtDecode;
 
  function ProductCard({ productdetails }) {
   const navigate = useNavigate();
@@ -51,6 +53,7 @@ import { useWishlist } from "../../Context/wishlist-context";
       if (token) {
         const user = jwt_decode(token);
 
+      
         if (!user) {
           localStorage.removeItem("token");
           showToast("warning", "", "Kindly Login");
