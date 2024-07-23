@@ -1,5 +1,5 @@
 import "./Wishlist.css";
-import jwt_decode from "jwt-decode";
+import  jwtDecode  from 'jwt-decode';
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import {} from "../../Context/wishlist-context";

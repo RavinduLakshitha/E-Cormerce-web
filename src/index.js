@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import jwtDecode from 'jwt-decode';
+
 import App from './App';
 import { ProductsProvider } from "./Context/product-context"
 import { GenreProvider } from "./Context/genre-context"
