@@ -1,17 +1,10 @@
-import React, { useState, useEffect } from "react";
-import {jwtDecode} from "jwt-decode";
-import "./UserAuth.css";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import {Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  useToast,
-  useUserLogin,
-  useWishlist,
-  useCart,
-  useOrders,
-} from "../../index";
+import { jwtDecode } from "jwt-decode";
+import { useToast, useUserLogin, useWishlist, useCart, useOrders } from "../../index";
+import "./UserAuth.css";
 
-const jwt_decode = jwtDecode;
 function Login() {
   const { setUserLoggedIn } = useUserLogin();
   const { showToast } = useToast();
@@ -21,77 +14,38 @@ function Login() {
 
   const [userEmail, setUserEmail] = useState("");
   const [userPassword, setUserPassword] = useState("");
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      const user = jwt_decode(token);
-      if (!user) {
-        localStorage.removeItem("token");
-      } else {
-        (async function getUpdatedWishlistAndCart() {
-          let updatedUserInfo = await axios.get(
-            "https://bookztron-server.vercel.app/api/user",
-            {
-              headers: {
-                "x-access-token": localStorage.getItem("token"),
-              },
-            }
-          );
-
-          if (updatedUserInfo.data.status === "ok") {
-            dispatchUserWishlist({
-              type: "UPDATE_USER_WISHLIST",
-              payload: updatedUserInfo.data.user.wishlist,
-            });
-            dispatchUserCart({
-              type: "UPDATE_USER_CART",
-              payload: updatedUserInfo.data.user.cart,
-            });
-            dispatchUserOrders({
-              type: "UPDATE_USER_ORDERS",
-              payload: updatedUserInfo.data.user.orders,
-            });
-          }
-        })();
-      }
-    }
-  }, []);
-
   const navigate = useNavigate();
 
   function loginUser(event) {
     event.preventDefault();
     axios
-      .post("https://bookztron-server.vercel.app/api/login", {
-        userEmail,
-        userPassword,
+      .post("http://localhost:5000/api/v1/user/login", {
+        email: userEmail,
+        password: userPassword,
       })
       .then((res) => {
-        if (res.data.user) {
-          localStorage.setItem("token", res.data.user);
-          showToast("success", "", "Logged in successfully");
-          setUserLoggedIn(true);
-          dispatchUserWishlist({
-            type: "UPDATE_USER_WISHLIST",
-            payload: res.data.wishlist,
-          });
-          dispatchUserCart({
-            type: "UPDATE_USER_CART",
-            payload: res.data.cart,
-          });
-          dispatchUserOrders({
-            type: "UPDATE_USER_ORDERS",
-            payload: res.data.orders,
-          });
+        if (res.status === 200) {
+          const { token, message, data } = res.data;
+          localStorage.setItem("token", token);
+
+          // // Decode token to get user data (Optional)
+          // const decodedUser = jwtDecode(token);
+
+          // showToast("success", "", message);
+          // setUserLoggedIn(true);
+
+          // // Updating state with user information if needed
+          // dispatchUserWishlist({ type: "UPDATE_USER_WISHLIST", payload: data.wishlist });
+          // dispatchUserCart({ type: "UPDATE_USER_CART", payload: data.cart });
+          // dispatchUserOrders({ type: "UPDATE_USER_ORDERS", payload: data.orders });
+
           navigate("/shop");
         } else {
-          throw new Error("Error in user login");
+          showToast("error", "", "Invalid credentials");
         }
       })
       .catch((err) => {
-        showToast("error", "", "Error logging in user. Please try again");
+        showToast("error", "", err.response?.data?.message || "Error logging in. Please try again");
       });
   }
 
@@ -101,9 +55,7 @@ function Login() {
         <h2>Login</h2>
 
         <div className="user-auth-input-container">
-          <label htmlFor="user-auth-input-email">
-            <h4>Email address</h4>
-          </label>
+          <label htmlFor="user-auth-input-email"><h4>Email address</h4></label>
           <input
             id="user-auth-input-email"
             className="user-auth-form-input"
@@ -116,9 +68,7 @@ function Login() {
         </div>
 
         <div className="user-auth-input-container">
-          <label htmlFor="user-auth-input-password">
-            <h4>Password</h4>
-          </label>
+          <label htmlFor="user-auth-input-password"><h4>Password</h4></label>
           <input
             id="user-auth-input-password"
             className="user-auth-form-input"
@@ -130,35 +80,12 @@ function Login() {
           />
         </div>
 
-        <div className="user-options-container">
-          <div className="remember-me-container">
-            <input type="checkbox" id="remember-me" />
-            <label htmlFor="remember-me">Remember Me</label>
-          </div>
-          <div>
-            <Link
-              to="#"
-              className="links-with-blue-underline"
-              id="forgot-password"
-            >
-              Forgot Password?
-            </Link>
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          className="solid-success-btn form-user-auth-submit-btn"
-        >
+        <button type="submit" className="solid-success-btn form-user-auth-submit-btn">
           Login
         </button>
 
         <div className="new-user-container">
-          <Link
-            to="/signup"
-            className="links-with-blue-underline"
-            id="new-user-link"
-          >
+          <Link to="/signup" className="links-with-blue-underline" id="new-user-link">
             Create new account &nbsp;
           </Link>
         </div>

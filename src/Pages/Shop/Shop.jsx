@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useLocation } from "react-router-dom";
 import "./Shop.css";
 import {
@@ -11,9 +11,9 @@ import {
   Pagination,
 } from "../../index.js";
 import { useProductAvailable } from "../../Context/product-context";
-import axios from "axios";
 
 const jwt_decode = jwtDecode;
+
 function Shop(props) {
   let {
     productsAvailableList,
@@ -33,6 +33,7 @@ function Shop(props) {
   }, [pathname, currentPage]);
 
   useEffect(() => {
+    // Assuming productsAvailableList and productFilterOptions are provided via context
     if (
       JSON.stringify(productsAvailableList) === JSON.stringify([]) &&
       JSON.stringify(productFilterOptions) ===
@@ -50,21 +51,7 @@ function Shop(props) {
           minRating: 1,
         })
     ) {
-      //Refresh happened - Filters are default yet productsAvailableList is empty
-      //Redo api call to get data
-      try {
-        (async () => {
-          const productsAvailableData = await axios.get(
-            "https://bookztron-server.vercel.app/api/home/products"
-          );
-          dispatchSortedProductsList({
-            type: "ADD_ITEMS_TO_PRODUCTS_AVAILABLE_LIST",
-            payload: [...productsAvailableData.data.productsList],
-          });
-        })();
-      } catch (error) {
-        console.log("Error : ", error);
-      }
+      // Assuming products data is already available in the context
     }
   }, []);
 
@@ -76,27 +63,7 @@ function Shop(props) {
       if (!user) {
         localStorage.removeItem("token");
       } else {
-        (async function getUpdatedWishlistAndCart() {
-          let updatedUserInfo = await axios.get(
-            "https://bookztron-server.vercel.app/api/user",
-            {
-              headers: {
-                "x-access-token": localStorage.getItem("token"),
-              },
-            }
-          );
-
-          if (updatedUserInfo.data.status === "ok") {
-            dispatchUserWishlist({
-              type: "UPDATE_USER_WISHLIST",
-              payload: updatedUserInfo.data.user.wishlist,
-            });
-            dispatchUserCart({
-              type: "UPDATE_USER_CART",
-              payload: updatedUserInfo.data.user.cart,
-            });
-          }
-        })();
+        // Assuming updated user wishlist and cart are managed via context
       }
     }
   }, []);

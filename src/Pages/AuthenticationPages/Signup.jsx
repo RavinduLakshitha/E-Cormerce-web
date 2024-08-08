@@ -25,7 +25,10 @@ function Signup() {
         // Assuming the backend sends a proper response object with a success status
         if (res.status === 200) {
           showToast("success", "", "New user created successfully");
-          navigate("/login");
+          console.log("Navigating to login...");
+navigate('/login');
+
+          
         } else {
           showToast("error", "", res.data.message || "Error occurred while creating new user");
         }
