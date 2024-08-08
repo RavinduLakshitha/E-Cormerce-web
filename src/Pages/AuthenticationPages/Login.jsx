@@ -28,11 +28,11 @@ function Login() {
           const { token, message, data } = res.data;
           localStorage.setItem("token", token);
 
-          // // Decode token to get user data (Optional)
-          // const decodedUser = jwtDecode(token);
+          const decodedUser = jwtDecode(token);
+          
 
-          // showToast("success", "", message);
-          // setUserLoggedIn(true);
+          showToast("success", "", message);
+          setUserLoggedIn(true);
 
           // // Updating state with user information if needed
           // dispatchUserWishlist({ type: "UPDATE_USER_WISHLIST", payload: data.wishlist });

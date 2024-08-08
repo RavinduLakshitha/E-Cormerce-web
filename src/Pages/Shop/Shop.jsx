@@ -51,7 +51,7 @@ function Shop(props) {
           minRating: 1,
         })
     ) {
-      // Assuming products data is already available in the context
+      
     }
   }, []);
 
@@ -63,7 +63,7 @@ function Shop(props) {
       if (!user) {
         localStorage.removeItem("token");
       } else {
-        // Assuming updated user wishlist and cart are managed via context
+        
       }
     }
   }, []);
