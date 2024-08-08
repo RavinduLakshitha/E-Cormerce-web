@@ -6,7 +6,8 @@ import "./UserAuth.css";
 
 function Signup() {
   const { showToast } = useToast();
-  const [termsAndConditionsCheckbox, setTermsAndConditionsCheckbox] = useState(false);
+  const [termsAndConditionsCheckbox, setTermsAndConditionsCheckbox] =
+    useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("");
@@ -30,12 +31,18 @@ navigate('/login');
 
           
         } else {
-          showToast("error", "", res.data.message || "Error occurred while creating new user");
+          showToast(
+            "error",
+            "",
+            res.data.message || "Error occurred while creating new user"
+          );
         }
       })
       .catch((err) => {
         // Improved error handling to account for various scenarios
-        const errorMessage = err.response?.data?.message || "Error creating new user. Please try again";
+        const errorMessage =
+          err.response?.data?.message ||
+          "Error creating new user. Please try again";
         showToast("error", "", errorMessage);
       });
   }
@@ -46,7 +53,9 @@ navigate('/login');
         <h2>Signup</h2>
 
         <div className="user-auth-input-container">
-          <label htmlFor="user-auth-input-name"><h4>Name</h4></label>
+          <label htmlFor="user-auth-input-name">
+            <h4>Name</h4>
+          </label>
           <input
             id="user-auth-input-name"
             className="user-auth-form-input"
@@ -54,13 +63,14 @@ navigate('/login');
             placeholder="Name"
             value={newUserName}
             onChange={(event) => setNewUserName(event.target.value)}
-            
             required
           />
         </div>
 
         <div className="user-auth-input-container">
-          <label htmlFor="user-auth-input-email"><h4>Email address</h4></label>
+          <label htmlFor="user-auth-input-email">
+            <h4>Email address</h4>
+          </label>
           <input
             id="user-auth-input-email"
             className="user-auth-form-input"
@@ -73,7 +83,9 @@ navigate('/login');
         </div>
 
         <div className="user-auth-input-container">
-          <label htmlFor="user-auth-input-password"><h4>Password</h4></label>
+          <label htmlFor="user-auth-input-password">
+            <h4>Password</h4>
+          </label>
           <input
             id="user-auth-input-password"
             className="user-auth-form-input"
@@ -90,9 +102,13 @@ navigate('/login');
             type="checkbox"
             id="accept-terms"
             checked={termsAndConditionsCheckbox}
-            onChange={() => setTermsAndConditionsCheckbox((prevState) => !prevState)}
+            onChange={() =>
+              setTermsAndConditionsCheckbox((prevState) => !prevState)
+            }
           />
-          <label htmlFor="accept-terms">I accept all terms and conditions</label>
+          <label htmlFor="accept-terms">
+            I accept all terms and conditions
+          </label>
         </div>
 
         <button
@@ -104,7 +120,11 @@ navigate('/login');
         </button>
 
         <div className="existing-user-container">
-          <Link to="/login" className="links-with-blue-underline existing-user-link" id="existing-user-link">
+          <Link
+            to="/login"
+            className="links-with-blue-underline existing-user-link"
+            id="existing-user-link"
+          >
             Already have an account &nbsp;
           </Link>
         </div>
