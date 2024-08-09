@@ -241,7 +241,7 @@ function productsOrderFunc(state, action) {
 let ProductsProvider = ({ children }) => {
   const [productsAvailableList, dispatchSortedProductsList] = useReducer(
     productsOrderFunc,
-    productList
+    []
   );
   const [productFilterOptions, dispatchProductFilterOptions] = useReducer(
     updateProductFilters,
@@ -249,16 +249,37 @@ let ProductsProvider = ({ children }) => {
   );
 
   useEffect(() => {
-    try {
-      (async () => {
+    const fetchProducts = async () => {
+      try {
         const productsAvailableData = await axios.get(
-          "https://bookztron-server.vercel.app/api/home/products"
+          "http://localhost:5000/api/v1/product"
         );
-        productList = [...productsAvailableData.data.productsList];
-      })();
-    } catch (error) {
-      console.log("Error : ", error);
-    }
+
+        // Check if productsList exists and is an array
+        const productsList = productsAvailableData.data.productsList;
+
+        if (Array.isArray(productsList)) {
+          dispatchSortedProductsList({
+            type: "ADD_ITEMS_TO_PRODUCTS_AVAILABLE_LIST",
+            payload: productsList,
+          });
+        } else {
+          console.error("Error: productsList is not an array or is undefined");
+          dispatchSortedProductsList({
+            type: "ADD_ITEMS_TO_PRODUCTS_AVAILABLE_LIST",
+            payload: [],
+          });
+        }
+      } catch (error) {
+        console.log("Error fetching products: ", error);
+        dispatchSortedProductsList({
+          type: "ADD_ITEMS_TO_PRODUCTS_AVAILABLE_LIST",
+          payload: [],
+        });
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   return (

@@ -3,7 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import {jwtDecode} from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import { useToast, useCart, useWishlist } from "../../index";
+import { useToast, useCart} from "../../index";
 import { useEffect } from "react";
 
 const jwt_decode = jwtDecode;
@@ -12,7 +12,6 @@ function HorizontalProductCard({ productDetails }) {
   const navigate = useNavigate();
 
   const { showToast } = useToast();
-  const { dispatchUserWishlist } = useWishlist();
   const { dispatchUserCart } = useCart();
   const {
     _id,
@@ -92,41 +91,6 @@ function HorizontalProductCard({ productDetails }) {
     }
   }
 
-  async function addItemToWishlist() {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      const user = jwt_decode(token);
-
-      if (!user) {
-        localStorage.removeItem("token");
-        showToast("warning", "", "Kindly Login");
-        navigate("/login");
-      } else {
-        const wishlistUpdateResponse = await axios.patch(
-          "https://bookztron-server.vercel.app/api/wishlist",
-          {
-            productdetails,
-          },
-          {
-            headers: {
-              "x-access-token": localStorage.getItem("token"),
-            },
-          }
-        );
-
-        if (wishlistUpdateResponse.data.status === "ok") {
-          dispatchUserWishlist({
-            type: "UPDATE_USER_WISHLIST",
-            payload: wishlistUpdateResponse.data.user.wishlist,
-          });
-          showToast("success", "", "Item successfully added to wishlist");
-        }
-      }
-    } else {
-      showToast("warning", "", "Kindly Login");
-    }
-  }
 
   return (
     <div className="card-basic-horizontal">
@@ -178,12 +142,6 @@ function HorizontalProductCard({ productDetails }) {
             onClick={(event) => removeItemFromCart(event)}
           >
             Remove from Cart
-          </button>
-          <button
-            className="outline-primary-btn"
-            onClick={() => addItemToWishlist()}
-          >
-            Add to Wishlist
           </button>
         </div>
         <div className="badge-on-card">{badgeText}</div>

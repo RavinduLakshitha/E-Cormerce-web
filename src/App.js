@@ -10,17 +10,14 @@ import {
   ProductPage,
   Login,
   Signup,
-  Wishlist,
   Cart,
   Orders,
   useUserLogin,
-  useWishlist,
   useCart,
 } from "./index";
 
 function App() {
   const { userLoggedIn } = useUserLogin();
-  const { dispatchUserWishlist } = useWishlist();
   const { dispatchUserCart } = useCart();
 
   return (
@@ -33,7 +30,6 @@ function App() {
           <Route path="/shop/:id" element={<ProductPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/orders" element={<Orders />} />
         </Routes>

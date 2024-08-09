@@ -14,7 +14,7 @@ import { BsShopWindow, BsFillBagFill } from "react-icons/bs";
 
 const jwt_decode = jwtDecode;
 function Navbar() {
-  const { userWishlist, dispatchUserWishlist } = useWishlist();
+  
   const { userCart, dispatchUserCart } = useCart();
   const { userOrders, dispatchUserOrders } = useOrders();
   const { setUserLoggedIn } = useUserLogin(false);
@@ -42,7 +42,7 @@ function Navbar() {
         setUserLoggedIn(true);
       } else {
         setUserLoggedIn(false);
-        dispatchUserWishlist({ type: "UPDATE_USER_WISHLIST", payload: [] });
+    
         dispatchUserCart({ type: "UPDATE_USER_CART", payload: [] });
         dispatchUserOrders({ type: "UPDATE_USER_ORDERS", payload: [] });
       }
@@ -52,11 +52,11 @@ function Navbar() {
     return function cleanup() {
       window.removeEventListener("storage", handleInvalidToken);
     };
-  }, [userWishlist, userCart]);
+  }, [userCart]);
 
   function logoutUser() {
     localStorage.removeItem("token");
-    dispatchUserWishlist({ type: "UPDATE_USER_WISHLIST", payload: [] });
+   
     dispatchUserCart({ type: "UPDATE_USER_CART", payload: [] });
     dispatchUserOrders({ type: "UPDATE_USER_ORDERS", payload: [] });
     setUserLoggedIn(false);
@@ -108,9 +108,7 @@ function Navbar() {
           <button className="icon-btn">
             <div className="icon-count-badge">
               <i className="fa fa-heart-o fa-x" aria-hidden="true"></i>
-              {userWishlist.length !== 0 && (
-                <span className="count-badge-x">{userWishlist.length}</span>
-              )}
+              
             </div>
           </button>
         </Link>

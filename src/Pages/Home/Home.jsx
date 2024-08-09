@@ -9,7 +9,6 @@ import {
   GenreCard,
   NewArrivals,
   Footer,
-  useWishlist,
   useCart,
 } from "../../index.js";
 import { useProductAvailable } from "../../Context/product-context";
@@ -18,7 +17,6 @@ import { useGenre } from "../../Context/genre-context";
 const jwt_decode = jwtDecode;
 function Home() {
   const { dispatchProductFilterOptions } = useProductAvailable();
-  const { dispatchUserWishlist } = useWishlist();
   const { dispatchUserCart } = useCart();
   const {
     setFictionCategoryCheckbox,
@@ -54,10 +52,6 @@ function Home() {
           );
 
           if (updatedUserInfo.data.status === "ok") {
-            dispatchUserWishlist({
-              type: "UPDATE_USER_WISHLIST",
-              payload: updatedUserInfo.data.user.wishlist,
-            });
             dispatchUserCart({
               type: "UPDATE_USER_CART",
               payload: updatedUserInfo.data.user.cart,

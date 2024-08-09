@@ -1,10 +1,9 @@
 import "./Cart.css";
 import { useEffect } from "react";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // Fix: Use named import for jwtDecode
 import axios from "axios";
 import { Link } from "react-router-dom";
 import {
-  useWishlist,
   useCart,
   HorizontalProductCard,
   ShoppingBill,
@@ -12,10 +11,9 @@ import {
 import Lottie from "react-lottie";
 import CartLottie from "../../Assets/Icons/cart.json";
 
-const jwt_decode = jwtDecode;
 function Cart() {
-  const { userWishlist, dispatchUserWishlist } = useWishlist();
   const { userCart, dispatchUserCart } = useCart();
+
   let cartObj = {
     loop: true,
     autoplay: true,
@@ -29,12 +27,12 @@ function Cart() {
     const token = localStorage.getItem("token");
 
     if (token) {
-      const user = jwt_decode(token);
+      const user = jwtDecode(token);
       if (!user) {
         localStorage.removeItem("token");
       } else {
-        if (userCart.length === 0 || userWishlist.length === 0) {
-          (async function getUpdatedWishlistAndCart() {
+        if (userCart.length === 0) {
+          (async function getUpdatedCart() {
             let updatedUserInfo = await axios.get(
               "https://bookztron-server.vercel.app/api/user",
               {
@@ -45,10 +43,6 @@ function Cart() {
             );
 
             if (updatedUserInfo.data.status === "ok") {
-              dispatchUserWishlist({
-                type: "UPDATE_USER_WISHLIST",
-                payload: updatedUserInfo.data.user.wishlist,
-              });
               dispatchUserCart({
                 type: "UPDATE_USER_CART",
                 payload: updatedUserInfo.data.user.cart,
@@ -58,10 +52,9 @@ function Cart() {
         }
       }
     } else {
-      dispatchUserWishlist({ type: "UPDATE_USER_WISHLIST", payload: [] });
       dispatchUserCart({ type: "UPDATE_USER_CART", payload: [] });
     }
-  }, []);
+  }, [userCart, dispatchUserCart]);
 
   return (
     <div className="cart-content-container">
@@ -77,7 +70,7 @@ function Cart() {
           />
           <h2>Your cart is empty 🙃</h2>
           <Link to="/shop">
-            <button className=" solid-primary-btn">Go to shop</button>
+            <button className="solid-primary-btn">Go to shop</button>
           </Link>
         </div>
       ) : (

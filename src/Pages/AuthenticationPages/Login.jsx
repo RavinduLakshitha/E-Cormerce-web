@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import {Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useToast, useUserLogin, useWishlist, useCart, useOrders } from "../../index";
+import { useToast, useUserLogin, useCart, useOrders } from "../../index";
 import "./UserAuth.css";
 
 function Login() {
   const { setUserLoggedIn } = useUserLogin();
   const { showToast } = useToast();
-  const { dispatchUserWishlist } = useWishlist();
   const { dispatchUserCart } = useCart();
   const { dispatchUserOrders } = useOrders();
 

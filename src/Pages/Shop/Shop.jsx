@@ -5,7 +5,6 @@ import "./Shop.css";
 import {
   Sidebar,
   ProductCard,
-  useWishlist,
   useCart,
   useSearchBar,
   Pagination,
@@ -21,7 +20,7 @@ function Shop(props) {
     productFilterOptions,
   } = useProductAvailable();
 
-  const { dispatchUserWishlist } = useWishlist();
+ 
   const { dispatchUserCart } = useCart();
   const { pathname } = useLocation();
   const { searchBarTerm } = useSearchBar();
@@ -33,7 +32,7 @@ function Shop(props) {
   }, [pathname, currentPage]);
 
   useEffect(() => {
-    // Assuming productsAvailableList and productFilterOptions are provided via context
+    
     if (
       JSON.stringify(productsAvailableList) === JSON.stringify([]) &&
       JSON.stringify(productFilterOptions) ===

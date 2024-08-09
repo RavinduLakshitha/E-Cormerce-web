@@ -9,7 +9,7 @@ import GuyWithBookLottie from "../../Assets/Icons/guy_with_book.json";
 
 const jwt_decode = jwtDecode;
 function Orders() {
-  const { userWishlist, dispatchUserWishlist } = useWishlist();
+  
   const { userCart, dispatchUserCart } = useCart();
   const { userOrders, dispatchUserOrders } = useOrders();
   let guyWithBookObj = {
@@ -49,12 +49,6 @@ function Orders() {
                 type: "UPDATE_USER_ORDERS",
                 payload: updatedUserInfo.data.user.orders,
               });
-              if (userWishlist.length === 0) {
-                dispatchUserWishlist({
-                  type: "UPDATE_USER_WISHLIST",
-                  payload: updatedUserInfo.data.user.wishlist,
-                });
-              }
               if (userCart.length === 0) {
                 dispatchUserCart({
                   type: "UPDATE_USER_CART",

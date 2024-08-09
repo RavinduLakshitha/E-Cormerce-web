@@ -4,13 +4,12 @@ import axios from "axios";
 import {jwtDecode} from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-import { useToast, useWishlist, useCart } from "../../index";
+import { useToast, useCart } from "../../index";
 
 const jwt_decode = jwtDecode;
 function ProductPage() {
   const navigate = useNavigate();
 
-  const { dispatchUserWishlist } = useWishlist();
   const { dispatchUserCart } = useCart();
   const { showToast } = useToast();
   const { id } = useParams();
@@ -31,75 +30,7 @@ function ProductPage() {
     description,
   } = productdetails;
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      const user = jwt_decode(token);
-      if (!user) {
-        localStorage.removeItem("token");
-      } else {
-        (async function getUpdatedWishlistAndCart() {
-          let updatedUserInfo = await axios.get(
-            "https://bookztron-server.vercel.app/api/user",
-            {
-              headers: {
-                "x-access-token": localStorage.getItem("token"),
-              },
-            }
-          );
-
-          if (updatedUserInfo.data.status === "ok") {
-            dispatchUserWishlist({
-              type: "UPDATE_USER_WISHLIST",
-              payload: updatedUserInfo.data.user.wishlist,
-            });
-            dispatchUserCart({
-              type: "UPDATE_USER_CART",
-              payload: updatedUserInfo.data.user.cart,
-            });
-          }
-        })();
-      }
-    }
-  }, []);
-
-  async function addItemToWishlist() {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      const user = jwt_decode(token);
-
-      if (!user) {
-        localStorage.removeItem("token");
-        showToast("warning", "", "Kindly Login");
-        navigate("/login");
-      } else {
-        let wishlistUpdateResponse = await axios.patch(
-          "https://bookztron-server.vercel.app/api/wishlist",
-          {
-            productdetails,
-          },
-          {
-            headers: {
-              "x-access-token": localStorage.getItem("token"),
-            },
-          }
-        );
-
-        if (wishlistUpdateResponse.data.status === "ok") {
-          dispatchUserWishlist({
-            type: "UPDATE_USER_WISHLIST",
-            payload: wishlistUpdateResponse.data.user.wishlist,
-          });
-          showToast("success", "", "Item successfully added to wishlist");
-        }
-      }
-    } else {
-      showToast("warning", "", "Kindly Login");
-    }
-  }
-
+  
   async function addItemToCart() {
     const token = localStorage.getItem("token");
 
@@ -167,15 +98,7 @@ function ProductPage() {
             </div>
           ) : (
             <div className="item-buttons">
-              <button
-                onClick={(event) => {
-                  event.preventDefault();
-                  addItemToWishlist();
-                }}
-                className="solid-primary-btn"
-              >
-                Add to wishlist
-              </button>
+              
               <button
                 onClick={() => {
                   addItemToCart();
